@@ -1,5 +1,7 @@
 # VF-MARKET: 가상피팅 기능을 적용한 쇼핑몰
 
+<img src="assets/logo.png" width="240" height="300">
+
 ## 팀원
 
 | 이름   | 학번      | 담당             |
