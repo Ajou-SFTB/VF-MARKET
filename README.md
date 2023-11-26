@@ -29,13 +29,13 @@
 
 - 프로젝트를 위해 아래의 환경을 구성하여 구현함
 
-| 분야         |        사용         |
-| :----------- | :-----------------: |
-| 프론트엔드   |  Vue.js, Bootstrap  |
-| 백엔드       |     Spring Boot     |
-| 데이터베이스 |        MySQL        |
+| 분야         | 사용                |
+| ------------ | ------------------- |
+| 프론트엔드   | Vue.js, Bootstrap   |
+| 백엔드       | Spring Boot         |
+| 데이터베이스 | MySQL               |
 | 머신러닝     | Google Colab, Flask |
-| 서버         |         AWS         |
+| 서버         | AWS                 |
 
 [![사용한 기술 스택](assets/techs.png "사용한 기술 스택")](assets/techs.png)
 
@@ -71,7 +71,7 @@
 
 #### 1-1. Naver Login
 
-<img src="assets/btnG_완성형.png" width="350" height="100">
+<img src="assets/btnG_완성형.png" width="400" height="100">
 
 - 네이버 소셜 로그인을 진행한다.
 
