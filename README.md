@@ -2,7 +2,11 @@
 
 <img src="assets/logo.png" width="240" height="300">
 
-## 팀원
+## 팀
+
+### 팀명: SFTB(Start From The Bottom)
+
+### 팀원
 
 | 이름   | 학번      | 담당             |
 | ------ | --------- | ---------------- |
