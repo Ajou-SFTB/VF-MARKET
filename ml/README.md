@@ -68,7 +68,8 @@ tf_upgrade_v2 --intree . --outtree . --copyotherfiles False
 ```
 
 - 위와 같이 CHIP_PGN 디렉토리에서 tf_upgrade_v2 명령어로 디렉토리 내의 모든 Python 파일의 TensorFlow 코드를 2버전으로 업그레이드 한다.
-- 그리고 CIHP_PGN/kaffe/tensorflow/network.py 파일의 코드를 수정한다.
+- 그리고 CIHP_PGN/kaffe/tensorflow/network.py 파일의 코드를 다음과 같이 수정한다.
+  - pip로 tf_slim이 설치된 상태여야 한다.
 
 ```python
 import numpy as np
