@@ -1,4 +1,4 @@
-# VF-MARKET: 가상피팅 기능을 적용한 쇼핑몰
+# VF-MARKET: 가상피팅 기능을 적용한 온라인 중고거래 마켓
 
 <img src="assets/logo.png" width="240" height="300">
 
@@ -26,7 +26,7 @@
 ## 프로젝트 소개
 
 - 이 프로젝트는 아주대학교 캡스톤디자인 과목의 프로젝트를 위해 작성됨
-- 본 프로젝트는 가상 피팅을 활용한 쇼핑몰을 기획한 프로젝트임
+- 본 프로젝트는 가상 피팅을 활용한 온라인 마켓을 기획한 프로젝트임
 - 여러 상품에 대해 자신의 스타일과 어울리는지 비교를 해보고 싶은 경우
 - 온라인으로 상품을 구매했을 때 상품이 구매자의 예상과 맞지 않는 것을 피하고 싶은 경우
 - 위와 같은 사람들을 위해서 Virtual fitting 기능을 통한 간접 경험을 제공하고자 'VR-MARKET'을 기획하게 되었다.
@@ -75,19 +75,13 @@
 
 ### 1. 외부 API
 
-#### 1-1. Naver Login
-
-<img src="assets/btnG_완성형.png" width="400" height="100">
-
-- 네이버 소셜 로그인을 진행한다.
-
-#### 1-2. Google Gmail SMTP Server
+#### 1-1. Google Gmail SMTP Server
 
 <img src="assets/gmail.png" width="200" height="200">
 
 - Google Gmail의 SMTP 서버를 통해 회원에게 인증번호 등의 메일을 보낸다.
 
-#### 1-3. PortOne 결제
+#### 1-2. PortOne 결제
 
 <img src="assets/portone.png" width="200" height="200">
 
