@@ -1,24 +1,36 @@
-# vue-cli
+# VF-MARKET: 가상피팅 기능을 적용한 온라인 중고거래 마켓
 
-## Project setup
-```
-npm install
-```
+VF-MARKET은 오프라인에서 직접 상품을 착용해보지 않아도 온라인 상에서 가상의 피팅 스타일을 알고 싶은 사람을 위한 1 대 1 중고 거래 서비스 입니다. 이미지 합성을 통한 가상 피팅 서비스를 통해 소비자는 예상과 다른 스타일로 인한 상품 구매 실패 횟수를 낮출 수 있습니다.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+**VR Fitting 서비스**
+- 구매하고자 하는 상품 가상의 피팅 스타일을 제공 합니다.
+- 사용자는 가상 피팅된 이미지를 저장하여 마이페이지에서 확인 할 수 있으며, 상품 구매시에 활용 할 수 있습니다.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+<br/>
 
-### Lints and fixes files
-```
-npm run lint
-```
+## SFTB Frontend 팀원
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+|이름|기여 분야|연락처|
+|:---:|---|:---:|
+|김진혁|진혁님꺼 추가해 주세요|<dog3027@ajou.ac.kr>|
+|전강우|회원가입 및 로그인, 상품 상세, 결제, VR Fitting 페이지 |<kwjeon98@ajou.ac.kr>|
+
+<br/>
+
+## Frontend 기술 스택
+
+<img src="https://i.ibb.co/Hh4hvZ9/2023-12-03-000236.png" alt="2023-12-03-000236" border="0">
+
+<br/>
+
+## 사용 프레임워크
+
+
+
+<br/>
+
+## 주요 디렉토리 구조
+
+
+<br/>
+
