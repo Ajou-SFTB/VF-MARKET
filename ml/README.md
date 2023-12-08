@@ -58,6 +58,36 @@
 - Openpose 전처리에 필요
 - 사람의 자세를 감지하고, 신체 부위를 점과 선으로 표현하여 결과를 이미지와 json 파일로 나타낸다.
 
+```
+@article{8765346,
+  author = {Z. {Cao} and G. {Hidalgo Martinez} and T. {Simon} and S. {Wei} and Y. A. {Sheikh}},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  title = {OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
+  year = {2019}
+}
+
+@inproceedings{simon2017hand,
+  author = {Tomas Simon and Hanbyul Joo and Iain Matthews and Yaser Sheikh},
+  booktitle = {CVPR},
+  title = {Hand Keypoint Detection in Single Images using Multiview Bootstrapping},
+  year = {2017}
+}
+
+@inproceedings{cao2017realtime,
+  author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
+  booktitle = {CVPR},
+  title = {Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
+  year = {2017}
+}
+
+@inproceedings{wei2016cpm,
+  author = {Shih-En Wei and Varun Ramakrishna and Takeo Kanade and Yaser Sheikh},
+  booktitle = {CVPR},
+  title = {Convolutional pose machines},
+  year = {2016}
+}
+```
+
 ### 2. CIHP_PGN
 
 - [Github Link](https://github.com/Engineering-Course/CIHP_PGN "Human parse에 사용")
@@ -92,6 +122,16 @@ tf.compat.v1.disable_eager_execution()
 - Densepose 전처리에 필요
 - 사람의 자세를 감지하고 신체 부위를 색으로 표현함
 
+```
+@misc{wu2019detectron2,
+  author =       {Yuxin Wu and Alexander Kirillov and Francisco Massa and
+                  Wan-Yen Lo and Ross Girshick},
+  title =        {Detectron2},
+  howpublished = {\url{https://github.com/facebookresearch/detectron2}},
+  year =         {2019}
+}
+```
+
 ### 4. CarveKit
 
 - [Github Link](https://github.com/OPHoperHPO/image-background-remove-tool/releases "이미지에서 배경을 없애는데 사용함. Cloth mask에 필요")
@@ -105,7 +145,26 @@ tf.compat.v1.disable_eager_execution()
 - 학습 외에도, Parse agnostic과 Human agnostic 전처리에 필요한 코드도 제공함
 - 각각 human parse와 원본 이미지에서 상품 이미지를 합성할 신체 부위를 따기 위해 필요함
 
+#### Citation
+
+```text
+@article{lee2022hrviton,
+  title={High-Resolution Virtual Try-On with Misalignment and Occlusion-Handled Conditions},
+  author={Lee, Sangyun and Gu, Gyojung and Park, Sunghyun and Choi, Seunghwan and Choo, Jaegul},
+  journal={arXiv preprint arXiv:2206.14180},
+  year={2022}
+}
+```
+
 Google Colab에서 전처리 과정 설정 등을 포함해서 실행시키기 위해 [여기](https://github.com/sangyun884/HR-VITON/issues/45)를 참조했음
+
+## 사용한 프레임워크
+
+<img src="../assets/flask.png" width="100%">
+
+- 학습된 모델을 사용해서 가상피팅을 진행하는데 local 환경에서는 불가능하므로 구글 Colab을 사용하기로 했다.
+- 이 때, 사용자의 이미지를 받아서 가상피팅을 진행하고 그 결과를 돌려주기 위해 Colab 쪽에도 웹 서버가 필요해짐
+- 당초엔 django를 사용할 예정이었으나, 굳이 django를 사용하기보다는 미니멀한 Python 웹 프레임워크인 Flask를 사용하기로 변경함
 
 ## 개발 환경
 
@@ -120,10 +179,9 @@ Google Colab에서 전처리 과정 설정 등을 포함해서 실행시키기 �
   - GPU는 V100 사용
   - 고용량 RAM 사용
 
-## 사용한 프레임워크
+### ngrok
 
-<img src="../assets/flask.png" width="100%">
+<img src="../assets/ngrok-blue-med.png" height="200">
 
-- 학습된 모델을 사용해서 가상피팅을 진행하는데 local 환경에서는 불가능하므로 구글 Colab을 사용하기로 했다.
-- 이 때, 사용자의 이미지를 받아서 가상피팅을 진행하고 그 결과를 돌려주기 위해 Colab 쪽에도 웹 서버가 필요해짐
-- 당초엔 django를 사용할 예정이었으나, 굳이 django를 사용하기보다는 미니멀한 Python 웹 프레임워크인 Flask를 사용하기로 변경함
+- 구글 Colab에서 실행한 Flask를 외부로 호스팅하기 위해 사용함
+- VF Market의 Spring 백엔드와의 연결을 통해 가상 피팅을 위한 데이터를 주고 받음
