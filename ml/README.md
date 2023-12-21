@@ -134,7 +134,7 @@ tf.compat.v1.disable_eager_execution()
 
 ### 4. CarveKit
 
-- [Github Link](https://github.com/OPHoperHPO/image-background-remove-tool/releases "이미지에서 배경을 없애는데 사용함. Cloth mask에 필요")
+- [Github Link](https://github.com/OPHoperHPO/image-background-remove-tool "이미지에서 배경을 없애는데 사용함. Cloth mask에 필요")
 - Cloth mask 전처리에 필요
 - Masking한 상품 이미지에서 배경을 없애는데 사용함
 
