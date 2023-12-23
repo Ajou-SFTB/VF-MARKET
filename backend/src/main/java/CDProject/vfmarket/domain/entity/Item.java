@@ -47,33 +47,24 @@ public class Item extends BaseTimeEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
-    //    private String image1;
-//    private String image2;
-//    private String image3;
-//    private String image4;
-//    private String image5;
-
     @Lob
     private String description;
 
     private String category;
 
-    @OneToOne(mappedBy = "item")
-    private Order order;
+    @OneToMany(mappedBy = "item")
+    private List<Order> order;
 
-//    @OneToOne(mappedBy = "item")
-//    private Refund refund;
+    private boolean reviewSubmitted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User itemUploadUser;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
-//    private Cart shoppingBasket;
     @ManyToMany(mappedBy = "items")
     private List<Cart> shoppingCarts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "item")
-    private List<Comment> comment = new ArrayList<>();
+//    @OneToMany(mappedBy = "item")
+//    private List<Comment> comment = new ArrayList<>();
 
     public List<Image> getImages() {
         if (this.images == null) {

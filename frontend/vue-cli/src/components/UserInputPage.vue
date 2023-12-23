@@ -24,19 +24,29 @@ export default {
       shoeSize: ''
     }
   },
+  created()
+  {
+      axios.interceptors.response.use((config) => {
+      return config;
+    }, function (error) {
+      if (error.response && error.response.status === 401) {
+        alert('로그인이 필요합니다.');
+        this.$router.push('/account/login');
+      }
+      return Promise.reject(error);
+    });
+
+  },
   methods: {
     submitForm() {
       axios.post('/user/update', {
-        //여기에서 이메일을 줄 수 가 있나?
         name: this.name,
         shoeSize: this.shoeSize
       })
-          .then(response => {
+          .then(() => {
             this.$router.push('/product/list');
-            console.log(response);
           })
-          .catch(error => {
-            console.log(error);
+          .catch(() => {
           });
     }
   }

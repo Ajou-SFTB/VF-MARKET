@@ -12,9 +12,9 @@ import CDProject.vfmarket.repository.ItemRepository;
 import CDProject.vfmarket.repository.OrderDetailRepository;
 import CDProject.vfmarket.repository.OrderRepository;
 import CDProject.vfmarket.repository.UserRepository;
+import CDProject.vfmarket.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,39 +33,36 @@ public class PaymentService {
 
     private final UserRepository userRepository;
 
+    private final NotificationService notificationService;
+
     public void saveOrder(Long userId, OrderSaveDto orderSaveDto) {
 
-        Optional<Item> items = itemRepository.findById(orderSaveDto.getId());
-//        if(items.isPresent()){
-//            Item item = items.get();
-//        }
-        log.info("item sellerName is {}", items.get().getSellerName());
-        items.get().setStatus(ItemStatus.STOP_SELLING);
-        Optional<User> sellerUser = userRepository.findById(userId);
-        log.info("sellerUser name is {}", sellerUser.get().getName());
-        Image firstImage = getFirstImage(items.get().getId());
+        Item items = itemRepository.findById(orderSaveDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + orderSaveDto.getId()));
+        items.setStatus(ItemStatus.TRANSACTION_IN);
+
+        User sellerUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        Image firstImage = getFirstImage(items.getId());
 
         String fileName = firstImage.getFileName();
-        log.info("findImage name is {}", fileName);
-        try {
-            Order order = Order.builder()
-                    .paymentPrice(orderSaveDto.getPaid_amount())
-                    .sellerName(orderSaveDto.getSeller_name())
-                    .sellerId(items.get().getSellerId())
-                    .merchant_uid(orderSaveDto.getMerchant_uid())
-                    .status(OrderStatus.COMPLETE_PAYMENT)
-                    .representativeImage(fileName)
-                    .build();
-            if (userRepository.findById(userId).isPresent()) {
-                order.setBuyer(userRepository.findById(userId).get());
-            }
-            order.setItem(items.get());
-            orderRepository.save(order);
-            itemRepository.save(items.get());
-        } catch (Exception e) {
-            log.info("order error!!", e);
+        Order order = Order.builder()
+                .paymentPrice(orderSaveDto.getPaid_amount())
+                .sellerName(orderSaveDto.getSeller_name())
+                .sellerId(items.getSellerId())
+                .merchant_uid(orderSaveDto.getMerchant_uid())
+                .status(OrderStatus.TRANSACTION_IN)
+                .representativeImage(fileName)
+                .build();
+        if (userRepository.findById(userId).isPresent()) {
+            order.setBuyer(userRepository.findById(userId).get());
         }
-        Order savedOrder = orderRepository.findByItem_Id(orderSaveDto.getId());
+        order.setItem(items);
+
+//        orderRepository.save(order);
+        itemRepository.save(items);
+
+//        Order savedOrder = orderRepository.findByItem_Id(orderSaveDto.getId());
         OrderDetail orderDetail = OrderDetail.builder()
                 .apply_num(orderSaveDto.getApply_num())
                 .buyer_addr(orderSaveDto.getBuyer_addr())
@@ -77,29 +74,14 @@ public class PaymentService {
                 .pg_provider(orderSaveDto.getPg_provider())
                 .imp_uid(orderSaveDto.getImp_uid())
                 .build();
-        orderDetail.setOrder(savedOrder);
+        orderDetail.setOrder(order);
+        orderRepository.save(order);
+
         orderDetailRepository.save(orderDetail);
-
-//        orderRepository.insertOrder(orders);
-
-//        for (OrderSaveDto dto : orderSaveDtos) {
-//            int curStock = productRepository.selectProductStock(dto.getProductId());
-//            int orderStock = dto.getOrderCount();
-//
-//            if (curStock - orderStock < 0) {
-//                throw new IllegalArgumentException("상품 재고가 부족합니다.");
-//            }
-//
-//            OrderProduct orderProduct = OrderProduct.builder()
-//                    .orderId(orders.getOrderId())
-//                    .productId(dto.getProductId())
-//                    .orderProductPrice(dto.getOrderPrice())
-//                    .orderProductCount(dto.getOrderCount())
-//                    .orderProductDiscount(dto.getOrderDiscount())
-//                    .productImage(dto.getProductImage())
-//                    .build();
-//            orderProductRepository.insertOrderProduct(orderProduct);
-//            productRepository.updateProductStock(dto.getProductId(), dto.getOrderCount());
+        notificationService.makeNotification(userId, orderSaveDto.getId(),
+                orderSaveDto.getName() + " 상품 결제를 하셨습니다.");
+        notificationService.makeNotificationBySellerName(orderSaveDto.getSeller_name(), orderSaveDto.getId(),
+                orderSaveDto.getName() + " 상품에 대한 거래가 체결되었습니다.");
     }
 
     public Image getFirstImage(Long itemId) {

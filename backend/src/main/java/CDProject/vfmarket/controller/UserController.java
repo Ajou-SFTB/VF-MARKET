@@ -1,19 +1,21 @@
 package CDProject.vfmarket.controller;
 
-import CDProject.vfmarket.domain.dto.EmailVerificationResponseDto;
-import CDProject.vfmarket.domain.dto.FirstRegistUserInfoDto;
-import CDProject.vfmarket.domain.dto.UserSignUpDto;
+import static CDProject.vfmarket.global.AuthenticationUserId.getAuthenticatedUser;
+
+import CDProject.vfmarket.domain.dto.SignUpDTO.FirstRegistUserInfoDto;
+import CDProject.vfmarket.domain.dto.SignUpDTO.UserSignUpDto;
+import CDProject.vfmarket.domain.dto.UserDTO.UserInfoDTO;
 import CDProject.vfmarket.domain.entity.EmailVerification;
 import CDProject.vfmarket.domain.entity.User;
-import CDProject.vfmarket.global.login.service.LoginService;
 import CDProject.vfmarket.service.MailService;
 import CDProject.vfmarket.service.UserService;
 import java.rmi.NoSuchObjectException;
-import java.util.Optional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final UserService userService;
     private final MailService mailService;
-    private final LoginService loginService;
-
-    @Value("${spring.mail.username}")
-    private String senderEmail;
 
     @PostMapping("/sign-up")
     public String signUp(@RequestBody UserSignUpDto userSignUpDto) throws Exception {
@@ -50,61 +49,58 @@ public class UserController {
     }
 
     @PostMapping("/mail-verify")
-    @CrossOrigin(origins = "http://localhost:3000/")
     public ResponseEntity mailVerify(String email) {
-        Optional<EmailVerification> optionalEmailVerification = mailService.findByEmail(email);
-        if (optionalEmailVerification.isPresent()) {
+        EmailVerification emailVerification = mailService.findByEmail(email);
+        if (emailVerification != null) {
             return new ResponseEntity(HttpStatus.IM_USED);
         }
 
         int sendCode = mailService.createNumber();
 
-        EmailVerificationResponseDto emailVerificationResponse =
-                EmailVerificationResponseDto.builder()
-                        .email(senderEmail)
-                        .sendCode(sendCode)
-                        .message("입력하신 이메일로 인증번호가 전송되었습니다.\n인증번호를 입력하세요.")
-                        .build();
-
         mailService.sendVerificationMail(email, sendCode);  // 인증 코드 메일 전송
 
         mailService.saveVerificationCode(email, sendCode);  // 인증 코드 DB 저장
 
-        return new ResponseEntity(emailVerificationResponse, HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/check-verification")
-    @CrossOrigin(origins = "http://localhost:3000/")
     public ResponseEntity checkVerification(String email, String verificationCode) {
+        EmailVerification emailVerification = mailService.findByEmail(email);
 
-        Optional<EmailVerification> optionalEmailVerification = mailService.findByEmail(email);
-
-        if (optionalEmailVerification.isPresent()) {
-            EmailVerification emailVerification = optionalEmailVerification.get();
-            if (emailVerification.getVerificationCode().equals(verificationCode)) {
-                mailService.deleteVerificationCode(emailVerification);
-                return new ResponseEntity(HttpStatus.OK);
-            } else {
-                // 인증번호 틀림
-                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            }
-        } else {
+        if (emailVerification == null) {
             // 이메일 정보 없음
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return new ResponseEntity("이메일을 다시 확인해주십시오.", HttpStatus.NO_CONTENT);
+        } else if (LocalDateTime.now().isAfter(emailVerification.getCreateDate().plusMinutes(3L))) {
+            // 인증 기간 만료
+            mailService.deleteVerificationCode(emailVerification);
+            return new ResponseEntity("인증 기간이 만료되었습니다.", HttpStatus.REQUEST_TIMEOUT);
+        } else if (emailVerification.getVerificationCode().equals(verificationCode)) {
+            // 인증 성공
+            mailService.deleteVerificationCode(emailVerification);
+            return new ResponseEntity("인증에 성공했습니다.",HttpStatus.OK);
+        } else {
+            // 인증번호 틀림
+            return new ResponseEntity("인증번호가 틀렸습니다.", HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping("/find-password")
-    @CrossOrigin(origins = "http://localhost:3000/")
-    public ResponseEntity findPassword(String email) {
-        String newPassword = String.valueOf(mailService.createNumber());
+    public ResponseEntity findPassword(String email, String name) {
+        int verificationCode = mailService.createNumber();
 
         try {
-            userService.findPassword(email, newPassword);
-            mailService.sendFindPasswordMail(email, newPassword);
-            return new ResponseEntity(newPassword, HttpStatus.OK);
+            User user = userService.findEmail(email);           // 임의의 비밀번호 설정
+            if (user.getName().equals(name)) {
+                mailService.sendFindPasswordMail(email, String.valueOf(verificationCode));   // 메일 발송
+                mailService.saveVerificationCode(email, verificationCode);  // 인증 번호 DB 저장
+                return new ResponseEntity<>(
+                        "인증번호가 이메일로 발송되었습니다\n3분 내로 입력 바랍니다", HttpStatus.OK);  // 메일 발송 성공
+            } else {
+                return new ResponseEntity<>("일치하는 정보가 없습니다.", HttpStatus.UNAUTHORIZED);
+            }
         } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("존재하지 않는 이메일입니다.", HttpStatus.NO_CONTENT);
         }
     }
 
@@ -114,10 +110,10 @@ public class UserController {
         try {
             User user = userService.findEmail(email);
             userService.updatePassword(user, password);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity("비밀번호 변경에 성공했습니다.", HttpStatus.OK);
         } catch (Exception e) {
             // 이메일에 해당하는 계정이 없음
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return new ResponseEntity("존재하지 않는 이메일입니다.", HttpStatus.NO_CONTENT);
         }
     }
 
@@ -129,5 +125,12 @@ public class UserController {
         } catch (NoSuchObjectException e) {
             return "해당 유저를 찾을 수 없습니다. => 근데 이럴리 없지";
         }
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("isAuthenticated()")
+    public UserInfoDTO getUserInfo() {
+        Long userId = getAuthenticatedUser();
+        return userService.userInformation(userId);
     }
 }

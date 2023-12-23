@@ -1,8 +1,8 @@
 <template>
   <b-list-group>
     <b-list-group-item v-for="(button, index) in buttons" :key="index" @click="button.action"
-                       @mouseover="highlightButton(button)" @mouseout="unhighlightButton(button)"
-                       :style="{ backgroundColor: button.backgroundColor, cursor: button.cursor }">
+                      @mouseover="highlightButton(button)" @mouseout="unhighlightButton(button)"
+                      :style="{ backgroundColor: button.backgroundColor, cursor: button.cursor }">
       {{ button.label }}
     </b-list-group-item>
   </b-list-group>
@@ -14,8 +14,10 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 0px;
-  /* 벽에 붙게 만들어야함 */
+  
 }
+
+
 </style>
 
 <script>
@@ -53,12 +55,18 @@ export default {
           action: this.goToSalesHistoryPage,
           backgroundColor: "transparent",
         },
+        {
+          label: "후기관리",
+          action: this.goToCommentPage,
+          backgroundColor: "transparent",
+        }
       ],
     };
   },
   methods: {
     highlightButton(button) {
-      button.backgroundColor = "#007bff";
+      button.backgroundColor = "#A0A0A0";
+      button.textColor = "#ffffff";
       button.cursor = "pointer";
     },
     unhighlightButton(button) {
@@ -88,6 +96,11 @@ export default {
     },
     goToSalesHistoryPage() {
       const targetRoute = "/user/mypage/saleshistory";
+      this.$router.push(targetRoute).catch(() => {
+      });
+    },
+    goToCommentPage() {
+      const targetRoute = "/user/mypage/comment";
       this.$router.push(targetRoute).catch(() => {
       });
     },

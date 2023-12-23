@@ -1,37 +1,34 @@
 <template>
   <div class="profilepage">
     <b-container>
-      <br>
       <b-row>
         <b-col md="12">
-          <h1>내정보</h1>
-          <br><br>
+          <h1 class="h1">내정보</h1>
         </b-col>
+        <div class="long-line"></div>
       </b-row>
       <b-row>
         <b-col md="3">
-          <button-list/>
+          <button-list />
         </b-col>
         <b-col md="9">
-          <div>
-            <h2>사용자 정보</h2>
-            <p>이름: {{ user.name }}</p>
-            <p>이메일: {{ user.email }}</p>
-            <p>신발 사이즈: {{ user.footsize }}</p>
-            <button @click="editMode = true">수정</button>
-          </div>
-          <div v-if="editMode">
+          <div class="content-container">
             <form @submit.prevent="submitForm">
-              <label>이름:</label>
-              <input type="text" v-model="user.name">
-              <label>이메일:</label>
-              <input type="text" v-model="user.email">
-              <label>신발 사이즈:</label>
-              <input type="text" v-model="user.footsize">
-              <button type="submit">저장</button>
-              <button @click="editMode = false">취소</button>
+              <div style="margin-bottom: 30px;">
+                <label for="userName" style="margin-right:80px;">이름</label>
+                <input type="text" id="userName" v-model="user.userName" class="input" />
+              </div>
+              <div style="margin-bottom: 30px;">
+                <label for="email" style="margin-right:62px;">이메일</label>
+                <input type="text" id="email" v-model="user.email" class="input" />
+              </div>
+              <div style="margin-bottom: 30px;">
+                <label for="size" style="margin-right:20px;">상의 사이즈</label>
+                <input type="text" id="size" v-model="user.size" class="input" />
+              </div>
             </form>
           </div>
+          <button class="buttons" type="submit">저장</button>
         </b-col>
       </b-row>
     </b-container>
@@ -50,49 +47,94 @@ export default {
   data() {
     return {
       user: {
-        name: '',
+        userName: '',
         email: '',
-        footsize: '',
+        size: '',
       },
       editMode: false
     }
   },
   created() {
     axios.interceptors.request.use((config) => {
-      // 요청을 보내기 전에 수행할 작업
-      const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰을 가져옵니다.
+      const token = localStorage.getItem('accessToken');
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`; // 토큰이 있으면 헤더에 추가합니다.
+        config.headers.Authorization = `Bearer ${token}`;
       }
-      console.log(config.headers.Authorization);
       return config;
     }, function (error) {
-      // 요청 에러 처리
+
+      return Promise.reject(error);
+    });
+        axios.interceptors.response.use((config) => {
+      return config;
+    }, function (error) {
+      if (error.response && error.response.status === 401) {
+        alert('로그인이 필요합니다.');
+        this.$router.push('/account/login');
+      }
       return Promise.reject(error);
     });
 
-    axios.get('/api/user')
-        .then(response => {
-          this.user = response.data;
-        })
-        .catch(error => {
-          console.log(error);
-        });
+    axios.get('/user')
+      .then(response => {
+        this.user = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
   },
   methods: {
-    submitForm() {
-      axios.put('/api/user', this.user)
-          .then(response => {
-            console.log(response);
-            this.editMode = false;
-          })
-          .catch(error => {
-            console.log(error);
-          });
-    }
+
   }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.profilepage {
+  margin-bottom: 400px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: bold;
+}
+
+.h1 {
+  margin-bottom: 40px;
+  margin-top: 40px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: bold;
+}
+
+.long-line {
+  height: 3px;
+  background-color: black;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  margin-left: 5%;
+  width: 90%;
+}
+
+.h2 {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.buttons {
+  background-color: black;
+  color: white;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  font-size: 20px;
+}
+
+.content-container {
+  font-size: 20px;
+  text-align: left;
+}
+
+.input {
+  text-align: center;
+}
+</style>

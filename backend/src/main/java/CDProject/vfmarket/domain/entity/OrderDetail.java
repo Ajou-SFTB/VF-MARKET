@@ -29,7 +29,6 @@ public class OrderDetail {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    // OrderDetail의 추가적인 필드들
     private String apply_num;
 
     private String pg_provider;
@@ -47,5 +46,9 @@ public class OrderDetail {
     private String card_name;
 
     private String card_number;
+
+    private String billingNumber;
+
+    private String deliveryCompany;
 
 }

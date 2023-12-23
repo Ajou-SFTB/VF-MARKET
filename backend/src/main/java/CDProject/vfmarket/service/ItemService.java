@@ -2,6 +2,7 @@ package CDProject.vfmarket.service;
 
 
 import CDProject.vfmarket.domain.dto.itemDTO.ItemDetailDto;
+import CDProject.vfmarket.domain.dto.itemDTO.ItemTextUpdateForm;
 import CDProject.vfmarket.domain.dto.itemDTO.ItemUpdateDto;
 import CDProject.vfmarket.domain.dto.itemDTO.ItemViewDto;
 import CDProject.vfmarket.domain.dto.itemDTO.SalesItemDto;
@@ -11,6 +12,8 @@ import CDProject.vfmarket.domain.entity.ItemStatus;
 import CDProject.vfmarket.exceptions.ResourceNotFoundException;
 import CDProject.vfmarket.repository.ImageRepository;
 import CDProject.vfmarket.repository.ItemRepository;
+import CDProject.vfmarket.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
     public List<ItemViewDto> productList() {
         return itemRepository.findAllItemListDto();
@@ -52,6 +56,16 @@ public class ItemService {
         List<MultipartFile> images = itemUpdateDto.getImages();
 
         return itemRepository.save(item);
+    }
+
+    public void updateText(ItemTextUpdateForm itemTextUpdateForm) {
+        Item item = itemRepository.findById(itemTextUpdateForm.getItemId()).orElseThrow(
+                () -> new EntityNotFoundException("Item not found with id: " + itemTextUpdateForm.getItemId()));
+        item.setDescription(itemTextUpdateForm.getDescription());
+        item.setItemName(itemTextUpdateForm.getName());
+        item.setCategory(itemTextUpdateForm.getCategory());
+        item.setShoeSize(itemTextUpdateForm.getShoeSize());
+        item.setPrice(itemTextUpdateForm.getPrice());
     }
 
 //    public void deleteItem(Long id) {
@@ -93,12 +107,12 @@ public class ItemService {
         itemDetailDto.setImages(images);
         itemDetailDto.setStatus(findItem.get().getStatus());
         itemDetailDto.setImageIds(imageIds);
+        itemDetailDto.setSellerId(findItem.get().getSellerId());
         return itemDetailDto;
     }
 
     public List<SalesItemDto> getSalesItems(Long sellerId) {
         List<Item> items = itemRepository.findAllBySellerId(sellerId);
-//        log.info("allSalesItems is {}", allSalesItems);
         return items.stream()
                 .map(item -> {
                     String firstImageFileName =
